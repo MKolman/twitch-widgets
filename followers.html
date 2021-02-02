@@ -1,0 +1,41 @@
+<html>
+<head>
+	<style>
+		body {
+			background-color: #252e38;
+			color: white;
+			font-size: 24px;
+		}
+		#load {
+			color: #f2bb13;
+			font-weight: bold;
+		}
+	</style>
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+	<meta content="utf-8" http-equiv="encoding">
+</head>
+<body>
+	<pre id="loading_bar"></pre>
+	<script>
+		async function getFollowers() {
+			let resp = await fetch('/url/https://streamlabs.com/api/v5/follower-goal/data/?token={{goal_token}}');
+			let data = await resp.json();
+			return data.data;
+		}
+		function setLoadingBar(txt, val, cap) {
+			let bar = `${"#".repeat(val)}${"·".repeat(Math.max(0, cap-val))}`;
+			let counter = `${val}/${cap}`;
+			bar = txt + bar.slice(txt.length,cap-counter.length) + counter + bar.slice(cap);
+			bar = `<span id="load">${bar.slice(0, val)}</span>${bar.slice(val)}`;
+			let el = document.getElementById('loading_bar');
+			let loading = `[${bar}]`;
+			el.innerHTML = loading;
+		}
+		async function update() {
+			let data = await getFollowers();
+			setLoadingBar(data.title, data.amount.current, data.amount.target);
+		}
+		update();
+	</script>
+</body>
+</html>
