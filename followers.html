@@ -32,10 +32,12 @@
 			el.innerHTML = loading;
 		}
 		async function update() {
+			console.log('Updating value...')
 			let data = await getFollowers();
 			setLoadingBar(data.title, data.amount.current, data.amount.target);
 		}
 		update();
+		setInterval(update, 30000);
 	</script>
 </body>
 </html>
