@@ -10,7 +10,13 @@ class Handler(server.BaseHTTPRequestHandler):
         txt = txt.replace(f'{{{{{key}}}}}', value)
     return txt
 
+  def do_POST(self):
+    self._do()
+
   def do_GET(self):
+    self._do()
+
+  def _do(self):
     path_parts = self.path.strip('/').split('/')
     for n in range(len(path_parts), 0, -1):
       handler_name = '_'.join(path_parts[:n])
@@ -21,18 +27,32 @@ class Handler(server.BaseHTTPRequestHandler):
     else:
       pass
 
-  def followers(self):
-    with open('followers.html', 'r') as template:
+  def _serve_template(self, template_name):
+    with open(template_name, 'r') as template:
       self.send_response(200)
       self.send_header('Content-type', 'text/html')
       self.end_headers()
       content = self._replace_template_variables(template.read())
       self.wfile.write(content.encode())
 
+  def followers(self):
+    self._serve_template('followers.html')
+
+  def rank(self):
+    self._serve_template('rank.html')
+
   def url(self):
     url = self.path[5:]
     print("Fetching", url)
-    resp = requests.get(url)
+
+    request_data = None
+    if self.headers['Content-Length']:
+      content_length = int(self.headers['Content-Length'])
+      request_data = self.rfile.read(content_length)
+
+    method = getattr(requests, self.command.lower(), requests.get)
+    resp = method(url, data=request_data)
+
     self.send_response(resp.status_code)
     self.send_header('Content-type', resp.headers['Content-Type'])
     self.end_headers()

@@ -1,0 +1,45 @@
+<html>
+<head>
+	<style>
+		body {
+			background-color: #f2bb13;
+			font-size: 200px;
+			color: #454c55;
+  			margin: auto;
+  			width: 300px;
+  			font-weight: bold;
+		}
+	</style>
+</head>
+<body>
+	<span id="rank"></span>
+	<script>
+		const URL = '/url/https://www.codingame.com/services/Leaderboards/getClashLeaderboard';
+		const FILTER = [1, {'keyword': '', 'active': false, 'column': '', 'filter': ''}, null, true, 'global', null];
+		const ME = '{{codingame_username}}';
+
+		async function getRank() {
+			let resp = await fetch(URL, {
+				method: 'POST',
+				body: JSON.stringify(FILTER)
+			});
+			return resp.json();
+		}
+		
+		function updateUI(rank) {
+			document.getElementById('rank').innerHTML = `#${rank}`;
+		}
+
+		async function update() {
+			let data = await getRank();
+			data.users.forEach((user) => {
+				if (user.pseudo == ME) {
+					updateUI(user.rank);
+				}
+			});
+		}
+		update();
+		setInterval(update, 30000);
+	</script>
+</body>
+</html>
