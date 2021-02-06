@@ -3,20 +3,36 @@
 	<style>
 		body {
 			background-color: #f2bb13;
-			font-size: 200px;
 			color: #454c55;
-  			margin: auto;
-  			width: 300px;
+  			width: 100%;
   			font-weight: bold;
+		}
+		body div {
+			margin: auto;
+			display: inline-block;
+			text-align: center;
+			font-size: 50px;
+			margin-right: 0.1em;
+
+			margin-top: -0.2em;
+			margin-bottom: -0.2em;
+		}
+		body div:first-child {
+			margin-right: 0;
+			display: block;
+			font-size: 200px;
+		}
+		body div:nth-child(2) {
+			font-size: 100px;
 		}
 	</style>
 </head>
 <body>
-	<span id="rank"></span>
 	<script>
 		const URL = '/url/https://www.codingame.com/services/Leaderboards/getClashLeaderboard';
 		const FILTER = [1, {'keyword': '', 'active': false, 'column': '', 'filter': ''}, null, true, 'global', null];
 		const ME = '{{codingame_username}}';
+		let prevRank = null;
 
 		async function getRank() {
 			let resp = await fetch(URL, {
@@ -27,7 +43,12 @@
 		}
 		
 		function updateUI(rank) {
-			document.getElementById('rank').innerHTML = `#${rank}`;
+			if (rank != prevRank) {
+				let container = document.createElement('div');
+				container.innerHTML = `#${rank}`;
+				document.body.prepend(container);
+				prevRank = rank;
+			}
 		}
 
 		async function update() {
