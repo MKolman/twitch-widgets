@@ -17,16 +17,65 @@
 <body>
 	<pre id="loading_bar"></pre>
 	<script>
-		async function getFollowers() {
-			let resp = await fetch('/url/https://streamlabs.com/api/v5/follower-goal/data/?token={{goal_token}}');
-			let data = await resp.json();
-			return data.data;
+		const URLS = {
+			USER: "https://api.twitch.tv/kraken/users?login={{twitch_username}}",
+			SEARCH: "https://api.twitch.tv/kraken/search/channels?query={{twitch_username}}",
+			CHANNEL: "https://api.twitch.tv/kraken/channels/",
+			GOAL: "/url/https://streamlabs.com/api/v5/follower-goal/data/?token={{goal_token}}",
+		};
+
+		let TWITCH_ID = null, GOAL = null;
+
+		async function getTwitch(url) {
+			return fetch(url, {
+				"headers": {
+					"accept": "application/vnd.twitchtv.v5+json",
+					"client-id": "p93h6xchryqkxtuywwtuxtssba0t7i",
+				}
+			});
 		}
-		function setLoadingBar(txt, val, cap) {
-			let bar = `${"#".repeat(val)}${"·".repeat(Math.max(0, cap-val))}`;
-			let counter = `${val}/${cap}`;
-			bar = txt + bar.slice(txt.length,cap-counter.length) + counter + bar.slice(cap);
-			bar = `<span id="load">${bar.slice(0, val)}</span>${bar.slice(val)}`;
+
+		async function setGoal() {
+			let resp = await fetch(URLS.GOAL);
+			let data = await resp.json();
+			GOAL = {
+				title: data.data.title,
+				current: data.data.amount.current,
+				target: data.data.amount.target,
+				start: data.data.amount.start,
+			};
+		}
+		async function setTwitchId() {
+			let resp = await getTwitch(URLS.USER);
+			let data = await resp.json();
+			if (data._total == 0) console.warn('Could not find user "{{twitch_username}}".', data);
+			else if (data._total > 1) console.warn('Got more than match for "{{twitch_username}}".', data);
+			else {
+				TWITCH_ID = data.users[0]._id;
+			}
+		}
+		async function getFollowers() {
+			let goal_fetch = null;
+			if (GOAL === null) { goal_fetch = setGoal(); }
+			if (TWITCH_ID === null) { await setTwitchId(); }
+			let resp = await getTwitch(URLS.CHANNEL+TWITCH_ID);
+			let data = await resp.json();
+			await goal_fetch;
+			return {
+				title: GOAL.title,
+				target: GOAL.target,
+				start: GOAL.start,
+				current: data.followers, 
+			};
+		}
+		function setLoadingBar(title, start, current, target) {
+			const done = Math.max(current - start, 0);
+			const undone = Math.max(0, target - start - done);
+			const total = target-start;
+			let bar = `${"#".repeat(done)}${"·".repeat(undone)}`;
+			let counter = `${current}/${target}`;
+			bar = title + bar.slice(title.length, total-counter.length) + counter + bar.slice(total);
+			bar = `<span id="load">${bar.slice(0, done)}</span>${bar.slice(done)}`;
 			let el = document.getElementById('loading_bar');
 			let loading = `[${bar}]`;
 			el.innerHTML = loading;
@@ -34,10 +83,10 @@
 		async function update() {
 			console.log('Updating value...')
 			let data = await getFollowers();
-			setLoadingBar(data.title, data.amount.current, data.amount.target);
+			setLoadingBar(data.title, data.start, data.current, data.target);
 		}
 		update();
-		setInterval(update, 30000);
+		setInterval(update, 5000);
 	</script>
 </body>
 </html>

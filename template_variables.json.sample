@@ -1,4 +1,5 @@
 {
+	"twitch_username": "YourUsername",
 	"goal_token": "Your token here",
-	"codingame_username": "your_username"
+	"codingame_username": "YourUsername"
 }
