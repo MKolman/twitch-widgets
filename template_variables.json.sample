@@ -1,5 +1,6 @@
 {
 	"twitch_username": "YourUsername",
 	"goal_token": "Your token here",
+	"codingame_id": "1234567",
 	"codingame_username": "YourUsername"
 }

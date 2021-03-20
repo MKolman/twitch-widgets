@@ -29,17 +29,17 @@
 </head>
 <body>
 	<script>
-		const URL = '/url/https://www.codingame.com/services/Leaderboards/getClashLeaderboard';
-		const FILTER = [1, {'keyword': '', 'active': false, 'column': '', 'filter': ''}, null, true, 'global', null];
+		const URL = '/url/https://www.codingame.com/services/Leaderboards/getCodinGamerClashRanking';
 		const ME = '{{codingame_username}}';
 		let prevRank = null;
 
 		async function getRank() {
-			let resp = await fetch(URL, {
-				method: 'POST',
-				body: JSON.stringify(FILTER)
+			let resp = await fetch("/url/https://www.codingame.com/services/Leaderboards/getCodinGamerClashRanking", {
+                "body": `[${ME},null,null]`,
+				"method": "POST",
 			});
-			return resp.json();
+			let data = await resp.json();
+			return data.rank;
 		}
 		
 		function updateUI(rank) {
@@ -52,12 +52,8 @@
 		}
 
 		async function update() {
-			let data = await getRank();
-			data.users.forEach((user) => {
-				if (user.pseudo == ME) {
-					updateUI(user.rank);
-				}
-			});
+			let rank = await getRank();
+			updateUI(rank);
 		}
 		update();
 		setInterval(update, 30000);
