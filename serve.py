@@ -51,7 +51,7 @@ class Handler(server.BaseHTTPRequestHandler):
       request_data = self.rfile.read(content_length)
 
     method = getattr(requests, self.command.lower(), requests.get)
-    resp = method(url, data=request_data)
+    resp = method(url, data=request_data, timeout=90)
 
     self.send_response(resp.status_code)
     self.send_header('Content-type', resp.headers['Content-Type'])
