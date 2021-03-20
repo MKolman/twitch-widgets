@@ -21,10 +21,9 @@
 			USER: "https://api.twitch.tv/kraken/users?login={{twitch_username}}",
 			SEARCH: "https://api.twitch.tv/kraken/search/channels?query={{twitch_username}}",
 			CHANNEL: "https://api.twitch.tv/kraken/channels/",
-			GOAL: "/url/https://streamlabs.com/api/v5/follower-goal/data/?token={{goal_token}}",
 		};
 
-		let TWITCH_ID = null, GOAL = null;
+		let TWITCH_ID = null, GOAL = null, GOAL_SPREAD=50;
 
 		async function getTwitch(url) {
 			return fetch(url, {
@@ -35,14 +34,12 @@
 			});
 		}
 
-		async function setGoal() {
-			let resp = await fetch(URLS.GOAL);
-			let data = await resp.json();
+		function setGoal(current) {
+            let start = GOAL_SPREAD * parseInt(current/GOAL_SPREAD);
 			GOAL = {
-				title: data.data.title,
-				current: data.data.amount.current,
-				target: data.data.amount.target,
-				start: data.data.amount.start,
+				title: 'Followers',
+				target: start,
+				start: start + GOAL_SPREAD,
 			};
 		}
 		async function setTwitchId() {
@@ -56,11 +53,10 @@
 		}
 		async function getFollowers() {
 			let goal_fetch = null;
-			if (GOAL === null) { goal_fetch = setGoal(); }
 			if (TWITCH_ID === null) { await setTwitchId(); }
 			let resp = await getTwitch(URLS.CHANNEL+TWITCH_ID);
 			let data = await resp.json();
-			await goal_fetch;
+			if (GOAL === null) { GOAL = setGoal(data.followers); }
 			return {
 				title: GOAL.title,
 				target: GOAL.target,
