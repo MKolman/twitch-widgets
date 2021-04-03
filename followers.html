@@ -36,10 +36,10 @@
 
 		function setGoal(current) {
             let start = GOAL_SPREAD * parseInt(current/GOAL_SPREAD);
-			GOAL = {
+			return {
 				title: 'Followers',
-				target: start,
-				start: start + GOAL_SPREAD,
+				start: start,
+				target: start + GOAL_SPREAD,
 			};
 		}
 		async function setTwitchId() {
