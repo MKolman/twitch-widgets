@@ -30,11 +30,11 @@
 <body>
 	<script>
 		const URL = '/url/https://www.codingame.com/services/Leaderboards/getCodinGamerClashRanking';
-		const ME = '{{codingame_username}}';
+		const ME = '{{codingame_id}}';
 		let prevRank = null;
 
 		async function getRank() {
-			let resp = await fetch("/url/https://www.codingame.com/services/Leaderboards/getCodinGamerClashRanking", {
+			let resp = await fetch(URL, {
                 "body": `[${ME},null,null]`,
 				"method": "POST",
 			});
