@@ -1,0 +1,9 @@
+{
+    "allow": [
+        "my@email.ie",
+        "test@gmail.com"
+    ],
+    "block": [
+        "me@internet"
+    ]
+}

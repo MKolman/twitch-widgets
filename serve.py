@@ -2,6 +2,7 @@ import requests
 import json
 from http import server
 
+
 class Handler(server.BaseHTTPRequestHandler):
   def _replace_template_variables(self, txt):
     with open('template_variables.json') as f:
@@ -40,6 +41,12 @@ class Handler(server.BaseHTTPRequestHandler):
 
   def rank(self):
     self._serve_template('rank.html')
+
+  def game(self):
+    self._serve_template('game.html')
+
+  def regame_data(self):
+    self._serve_template('data/testre.json');
 
   def url(self):
     url = self.path[5:]
